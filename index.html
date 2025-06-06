@@ -4,337 +4,606 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Equipment Maintenance Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        
+        .navbar-brand {
+            font-weight: 700;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .status-good {
+            background-color: #2ecc71;
+        }
+        
+        .status-warning {
+            background-color: #f39c12;
+        }
+        
+        .status-critical {
+            background-color: #e74c3c;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .filter-section {
             background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-        .summary-cards {
-            display: flex;
-            justify-content: space-between;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
         }
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            width: 23%;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .card h3 {
-            margin-top: 0;
-            color: #555;
-        }
-        .card .value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .card.ok {
-            border-top: 4px solid #28a745;
-        }
-        .card.warning {
-            border-top: 4px solid #ffc107;
-        }
-        .card.overdue {
-            border-top: 4px solid #dc3545;
-        }
-        .equipment-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-        .equipment-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-        }
-        .equipment-card h3 {
-            margin-top: 0;
-            display: flex;
-            justify-content: space-between;
-        }
-        .status-ok {
-            color: #28a745;
-        }
-        .status-warning {
-            color: #ffc107;
-        }
-        .status-overdue {
-            color: #dc3545;
-        }
-        progress {
+        
+        .equipment-image {
             width: 100%;
-            height: 20px;
-            margin: 10px 0;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
         }
-        progress::-webkit-progress-bar {
-            background-color: #eee;
-            border-radius: 10px;
+        
+        .badge-custom {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: normal;
         }
-        progress::-webkit-progress-value {
-            border-radius: 10px;
+        
+        .maintenance-table th {
+            background-color: var(--light-color);
         }
-        .ok-progress::-webkit-progress-value {
-            background-color: #28a745;
+        
+        .tab-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-        .warning-progress::-webkit-progress-value {
-            background-color: #ffc107;
+        
+        .nav-tabs .nav-link.active {
+            font-weight: 600;
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--secondary-color);
         }
-        .overdue-progress::-webkit-progress-value {
-            background-color: #dc3545;
+        
+        .nav-tabs .nav-link {
+            color: var(--dark-color);
+            border: none;
         }
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+        
+        .search-box {
+            position: relative;
         }
-        .metric {
-            text-align: center;
-            width: 48%;
+        
+        .search-box i {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #7f8c8d;
         }
-        .metric-value {
-            font-weight: bold;
-            font-size: 18px;
+        
+        .search-box input {
+            padding-left: 35px;
+            border-radius: 20px;
         }
-        .metric-label {
-            font-size: 12px;
-            color: #666;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .status-cell {
-            font-weight: bold;
-        }
-        .status-ok {
-            color: #28a745;
-        }
-        .status-warning {
-            color: #ffc107;
-        }
-        .status-overdue {
-            color: #dc3545;
+        
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Equipment Maintenance Dashboard</h1>
-        
-        <div class="summary-cards">
-            <div class="card">
-                <h3>Total Equipment</h3>
-                <div class="value">9</div>
-            </div>
-            <div class="card ok">
-                <h3>OK</h3>
-                <div class="value">3</div>
-            </div>
-            <div class="card warning">
-                <h3>Warning</h3>
-                <div class="value">3</div>
-            </div>
-            <div class="card overdue">
-                <h3>Overdue</h3>
-                <div class="value">3</div>
-            </div>
-        </div>
-        
-        <h2>Tippers Maintenance Status</h2>
-        <div class="equipment-grid">
-            <!-- Equipment Card 1 -->
-            <div class="equipment-card">
-                <h3>Tipper #1 (AP39UQ0095) <span class="status-ok">OK 🟢</span></h3>
-                <progress class="ok-progress" value="80" max="100"></progress>
-                <div class="metric-row">
-                    <div class="metric">
-                        <div class="metric-value">5,346.7</div>
-                        <div class="metric-label">Current HMR</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">6,105.3</div>
-                        <div class="metric-label">Due At</div>
-                    </div>
-                </div>
-                <div class="metric">
-                    <div class="metric-value" style="color: #28a745;">758.6 hours</div>
-                    <div class="metric-label">Balance</div>
-                </div>
-                <button style="width: 100%; margin-top: 10px; padding: 8px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Details</button>
-            </div>
-            
-            <!-- Equipment Card 2 -->
-            <div class="equipment-card">
-                <h3>Tipper #2 (AP39UQ0097) <span class="status-warning">Warning 🟡</span></h3>
-                <progress class="warning-progress" value="92" max="100"></progress>
-                <div class="metric-row">
-                    <div class="metric">
-                        <div class="metric-value">5,447.9</div>
-                        <div class="metric-label">Current HMR</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">6,202.8</div>
-                        <div class="metric-label">Due At</div>
-                    </div>
-                </div>
-                <div class="metric">
-                    <div class="metric-value" style="color: #ffc107;">754.9 hours</div>
-                    <div class="metric-label">Balance</div>
-                </div>
-                <button style="width: 100%; margin-top: 10px; padding: 8px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Details</button>
-            </div>
-            
-            <!-- Equipment Card 3 -->
-            <div class="equipment-card">
-                <h3>Tipper #3 (AP39UW9881) <span class="status-overdue">Overdue 🔴</span></h3>
-                <progress class="overdue-progress" value="105" max="100"></progress>
-                <div class="metric-row">
-                    <div class="metric">
-                        <div class="metric-value">2,855.0</div>
-                        <div class="metric-label">Current HMR</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value">3,547.0</div>
-                        <div class="metric-label">Due At</div>
-                    </div>
-                </div>
-                <div class="metric">
-                    <div class="metric-value" style="color: #dc3545;">692.0 hours</div>
-                    <div class="metric-label">Balance</div>
-                </div>
-                <button style="width: 100%; margin-top: 10px; padding: 8px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Details</button>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-color);">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-tools me-2"></i>Maintenance Tracker
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-1"></i> Schedule</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-clipboard-list me-1"></i> Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-cog me-1"></i> Settings</a>
+                    </li>
+                </ul>
             </div>
         </div>
-        
-        <h2>All Equipment</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Asset No.</th>
-                    <th>Equipment</th>
-                    <th>Reg No.</th>
-                    <th>Current HMR</th>
-                    <th>Next Due</th>
-                    <th>Balance</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>AL-1</td>
-                    <td>Tipper #1</td>
-                    <td>AP39UQ0095</td>
-                    <td>5,346.7</td>
-                    <td>6,105.3</td>
-                    <td>758.6</td>
-                    <td class="status-cell status-ok">OK 🟢</td>
-                </tr>
-                <tr>
-                    <td>AL-2</td>
-                    <td>Tipper #2</td>
-                    <td>AP39UQ0097</td>
-                    <td>5,447.9</td>
-                    <td>6,202.8</td>
-                    <td>754.9</td>
-                    <td class="status-cell status-warning">Warning 🟡</td>
-                </tr>
-                <tr>
-                    <td>AL-3</td>
-                    <td>Tipper #3</td>
-                    <td>AP39UW9881</td>
-                    <td>2,855.0</td>
-                    <td>3,547.0</td>
-                    <td>692.0</td>
-                    <td class="status-cell status-overdue">Overdue 🔴</td>
-                </tr>
-                <tr>
-                    <td>AL-4</td>
-                    <td>Tipper #4</td>
-                    <td>AP39UW9880</td>
-                    <td>2,891.0</td>
-                    <td>3,300.0</td>
-                    <td>409.0</td>
-                    <td class="status-cell status-overdue">Overdue 🔴</td>
-                </tr>
-                <tr>
-                    <td>AL-5</td>
-                    <td>Tipper #5</td>
-                    <td>AP39UY4651</td>
-                    <td>2,212.0</td>
-                    <td>2,540.0</td>
-                    <td>328.0</td>
-                    <td class="status-cell status-overdue">Overdue 🔴</td>
-                </tr>
-                <tr>
-                    <td>AL-6</td>
-                    <td>Tipper #6</td>
-                    <td>AP39UY4652</td>
-                    <td>2,234.0</td>
-                    <td>2,157.0</td>
-                    <td>-77.0</td>
-                    <td class="status-cell status-warning">Warning 🟡</td>
-                </tr>
-                <tr>
-                    <td>AL-7</td>
-                    <td>Tipper #7</td>
-                    <td>AP39WC0926</td>
-                    <td>1,009.0</td>
-                    <td>1,000.0</td>
-                    <td>-9.0</td>
-                    <td class="status-cell status-warning">Warning 🟡</td>
-                </tr>
-                <tr>
-                    <td>AL-8</td>
-                    <td>Tipper #8</td>
-                    <td>AP39WC0927</td>
-                    <td>972.0</td>
-                    <td>1,000.0</td>
-                    <td>28.0</td>
-                    <td class="status-cell status-ok">OK 🟢</td>
-                </tr>
-                <tr>
-                    <td>AL-9</td>
-                    <td>Tipper #9</td>
-                    <td>AP39WC0928</td>
-                    <td>1,005.0</td>
-                    <td>1,000.0</td>
-                    <td>-5.0</td>
-                    <td class="status-cell status-ok">OK 🟢</td>
-                </tr>
-            </tbody>
-        </table>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <!-- Header and Stats -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2><i class="fas fa-truck me-2"></i>Equipment Maintenance Dashboard</h2>
+                <p class="text-muted">Track and manage all maintenance activities</p>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center py-2">
+                                <h5 class="card-title">12</h5>
+                                <p class="card-text small">Active</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card bg-warning text-dark">
+                            <div class="card-body text-center py-2">
+                                <h5 class="card-title">3</h5>
+                                <p class="card-text small">Due Soon</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body text-center py-2">
+                                <h5 class="card-title">1</h5>
+                                <p class="card-text small">Overdue</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="filter-section mb-4">
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <select class="form-select">
+                        <option selected>All Equipment Types</option>
+                        <option>Tipper</option>
+                        <option>Excavator</option>
+                        <option>Loader</option>
+                        <option>Crane</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <select class="form-select">
+                        <option selected>All Status</option>
+                        <option>Good</option>
+                        <option>Due Soon</option>
+                        <option>Overdue</option>
+                    </select>
+                </div>
+                <div class="col-md-4 search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Search equipment...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipment Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>AL-1 - TIPPER - 1 (AP39UQ0095)</span>
+                <span class="badge bg-success">Active</span>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="equipmentTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Overview</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="filters-tab" data-bs-toggle="tab" data-bs-target="#filters" type="button">Filters</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="fluids-tab" data-bs-toggle="tab" data-bs-target="#fluids" type="button">Fluids</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button">History</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="equipmentTabContent">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <th width="40%">Asset Number</th>
+                                        <td>AL-1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Equipment Type</th>
+                                        <td>Tipper - 1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Registration No.</th>
+                                        <td>AP39UQ0095</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Commissioning Date</th>
+                                        <td>Not specified</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Current HMR</th>
+                                        <td>5346.7 (14-May-2025)</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-exclamation-triangle me-2"></i>Maintenance Alerts</h5>
+                                <div class="alert alert-warning">
+                                    <strong><i class="fas fa-clock me-2"></i>Upcoming Maintenance</strong>
+                                    <p class="mb-0">Breather Element Filter due in 32 days (15-Jun-2025)</p>
+                                </div>
+                                <div class="alert alert-info">
+                                    <strong><i class="fas fa-oil-can me-2"></i>Recent Service</strong>
+                                    <p class="mb-0">Last service on 16-Apr-2025 at 5105.3 HMR</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filters Tab -->
+                    <div class="tab-pane fade" id="filters" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-striped maintenance-table">
+                                <thead>
+                                    <tr>
+                                        <th>Filter Type</th>
+                                        <th>Part Number</th>
+                                        <th>Last Changed</th>
+                                        <th>HMR at Change</th>
+                                        <th>Interval</th>
+                                        <th>Due At</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Engine Oil Filter</td>
+                                        <td>21707134 (QTY-2)</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>1000 hrs</td>
+                                        <td>6105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fuel Filter</td>
+                                        <td>21879886</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>1000 hrs</td>
+                                        <td>6105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>By Pass Filter</td>
+                                        <td>21707132</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>1000 hrs</td>
+                                        <td>6105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Racor (Fuel) Filter</td>
+                                        <td>56107</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>1000 hrs</td>
+                                        <td>6105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fuel Tank Ventilation Filter</td>
+                                        <td>21743197</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>1000 hrs</td>
+                                        <td>6105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Air Filter Primary (Outer)</td>
+                                        <td>21337557</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>1500 hrs</td>
+                                        <td>6605.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (1258.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Air Filter Secondary (Inner)</td>
+                                        <td>21693755</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>4500 hrs</td>
+                                        <td>10105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (4758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>APM Filter Cartridge</td>
+                                        <td>22223804</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>3000 hrs/12 months</td>
+                                        <td>8105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (2758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Climate Unit Filter</td>
+                                        <td>21758906</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>2000 hrs</td>
+                                        <td>7105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (1758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gear Box Filter</td>
+                                        <td>21479106</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>5000 hrs</td>
+                                        <td>10105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (4758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Power Steering Filter</td>
+                                        <td>21392404</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>5000 hrs</td>
+                                        <td>10105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (4758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Breather Element Filter</td>
+                                        <td>20213001</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>60 days</td>
+                                        <td>15-Jun-25</td>
+                                        <td><span class="status-indicator status-warning"></span> Due Soon (32 days left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Return Line Filter Element</td>
+                                        <td>20214008</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>120 days</td>
+                                        <td>14-Aug-25</td>
+                                        <td><span class="status-indicator status-good"></span> Good (92 days left)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Fluids Tab -->
+                    <div class="tab-pane fade" id="fluids" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-striped maintenance-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fluid Type</th>
+                                        <th>Specification</th>
+                                        <th>Part Number</th>
+                                        <th>Quantity</th>
+                                        <th>Last Changed</th>
+                                        <th>HMR at Change</th>
+                                        <th>Interval</th>
+                                        <th>Due At</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Engine Oil</td>
+                                        <td>VOLVO 67-20210 (VDS4), PETRONAS URANIA 3000LS 15W-40</td>
+                                        <td>-</td>
+                                        <td>38 L</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>1000 hrs/6 months/25000L fuel</td>
+                                        <td>6105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rear Axle Oil</td>
+                                        <td>VOLVO SYNTHETIC SAE75W-90 API GL5</td>
+                                        <td>85136279, 85136280, 1161949, 1161985</td>
+                                        <td>48.5 L</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>5000 hrs/24 months</td>
+                                        <td>10105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (4758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Transmission Oil</td>
+                                        <td>VOLVO SYNTHETIC SAE 75W-90 API GL4</td>
+                                        <td>85107476, 85136283, 85136284</td>
+                                        <td>16.5 L</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>5000 hrs/12 months</td>
+                                        <td>10105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (4758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Power Steering Oil</td>
+                                        <td>PETRONAS TUTELA ATF D3, DEXRON-IIIH/DEXRON-IIIG</td>
+                                        <td>1161995</td>
+                                        <td>6 L</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>5000 hrs/12 months</td>
+                                        <td>10105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (4758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Coolant</td>
+                                        <td>VOLVO PREMIXED PROFAR OT READY</td>
+                                        <td>85108914</td>
+                                        <td>42 L</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>4000 hrs/4 years</td>
+                                        <td>9105.3</td>
+                                        <td><span class="status-indicator status-good"></span> Good (3758.6 hrs left)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hydraulic Oil</td>
+                                        <td>PETRONAS HIDROBAK HV 68</td>
+                                        <td>1026750</td>
+                                        <td>135 L</td>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>365 days</td>
+                                        <td>16-Apr-26</td>
+                                        <td><span class="status-indicator status-good"></span> Good (337 days left)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- History Tab -->
+                    <div class="tab-pane fade" id="history" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-striped maintenance-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>HMR</th>
+                                        <th>Service Type</th>
+                                        <th>Description</th>
+                                        <th>Technician</th>
+                                        <th>Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>16-Apr-25</td>
+                                        <td>5105.3</td>
+                                        <td>Regular Service</td>
+                                        <td>Full service including all filters and fluids</td>
+                                        <td>John Smith</td>
+                                        <td>$1,250.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>15-Jan-25</td>
+                                        <td>4100.5</td>
+                                        <td>Oil Change</td>
+                                        <td>Engine oil and filter change</td>
+                                        <td>Mike Johnson</td>
+                                        <td>$350.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10-Oct-24</td>
+                                        <td>3102.7</td>
+                                        <td>Regular Service</td>
+                                        <td>Scheduled maintenance</td>
+                                        <td>Sarah Williams</td>
+                                        <td>$980.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>05-Jul-24</td>
+                                        <td>2105.8</td>
+                                        <td>Filter Replacement</td>
+                                        <td>Air and fuel filters replacement</td>
+                                        <td>John Smith</td>
+                                        <td>$420.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>20-Mar-24</td>
+                                        <td>1100.2</td>
+                                        <td>Regular Service</td>
+                                        <td>Initial service after commissioning</td>
+                                        <td>Mike Johnson</td>
+                                        <td>$1,100.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <button class="btn btn-sm btn-outline-secondary me-2"><i class="fas fa-print me-1"></i> Print</button>
+                <button class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-file-pdf me-1"></i> PDF</button>
+                <button class="btn btn-sm btn-primary"><i class="fas fa-plus me-1"></i> Add Service Record</button>
+            </div>
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-3 mt-4">
+        <div class="container text-center">
+            <p class="text-muted mb-0">© 2023 Maintenance Tracker System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple JavaScript for demonstration
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can add interactive functionality here
+            console.log('Maintenance Tracker loaded');
+        });
+    </script>
 </body>
 </html>
